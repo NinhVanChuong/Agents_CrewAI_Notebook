@@ -3,32 +3,18 @@ import os
 os.environ["OPENAI_API_KEY"] = ""
 
 from crewai import Crew, Process, Agent, Task 
-from langchain_core.callbacks import BaseCallbackHandler 
 from typing import TYPE_CHECKING, Any, Dict, Optional 
 from langchain_openai import ChatOpenAI
+from crewai.tasks.task_output import TaskOutput
+from crewai.tasks.task_output import TaskOutput
 
 llm = ChatOpenAI(model="gpt-4o-mini")
 
-avators = {"Writer":"https://cdn-icons-png.flaticon.com/512/320/320336.png",
-            "Reviewer":"https://cdn-icons-png.freepik.com/512/9408/9408201.png"}
+avators = {"support_agent":"https://cdn-icons-png.flaticon.com/512/320/320336.png"}
 
-class MyCustomHandler(BaseCallbackHandler):
-    def __init__(self, agent_name: str) -> None:
-        self.agent_name = agent_name
-
-    def on_chain_start(
-        self, serialized: Dict[str, Any], inputs: Dict[str, Any], **kwargs: Any
-    ) -> None:
-        """Print out that we are entering a chain."""
-        print("input chain: ", inputs["input"])
-        st.session_state.messages.append({"role": "assistant", "content": inputs["input"]})
-        st.chat_message("assistant").write(inputs["input"])
-
-    def on_chain_end(self, outputs: Dict[str, Any], **kwargs: Any) -> None:
-        """Print out that we finished a chain."""
-        print("end chain: ", outputs["output"])
-        st.session_state.messages.append({"role": self.agent_name, "content": outputs["output"]})
-        st.chat_message(self.agent_name, avatar=avators[self.agent_name]).write(outputs["output"])  
+def callback_function(output: TaskOutput):
+    st.session_state.messages.append({"role": "support_agent", "content": output.raw})
+    st.chat_message("support_agent", avatar=avators["support_agent"]).write(output.raw)  
 
 writer = Agent(
     role='Chuyên gia viết blog',
@@ -40,8 +26,7 @@ writer = Agent(
         Bạn hãy viết blog bằng tiếng Việt.
     ''',
     goal="Viết và chỉnh sửa một bài blog chất lượng.",
-    llm=llm,
-    callbacks=[MyCustomHandler("Writer")],
+    llm=llm
 )
 reviewer = Agent(
     role='Chuyên gia đánh giá chất lượng blog',
@@ -53,8 +38,7 @@ reviewer = Agent(
         Những đánh giá của bạn được thể hiện bằng tiếng Việt
     ''',
     goal="Liệt kê các yếu tố cần cải thiện của một bài blog cụ thể. Không đưa ra nhận xét về phần tóm tắt hoặc mở đầu của bài viết.",
-    llm=llm,
-    callbacks=[MyCustomHandler("Reviewer")],
+    llm=llm
 )
 
 st.title("💬 Chatbot")
@@ -72,23 +56,33 @@ if prompt := st.chat_input():
     st.session_state.messages.append({"role": "user", "content": prompt})
     st.chat_message("user").write(prompt)
 
-    task1 = Task(
+    write_blog_task = Task(
       description=f"""Viết một bài blog về {prompt}. """,
       agent=writer,
-      expected_output="Một bài viết khoảng 2000 từ"
+      expected_output="Một bài viết khoảng 2000 từ",
+      callback=callback_function
     )
 
-    task2 = Task(
+    review_blog_task = Task(
       description="""Liệt kê các nhận xét đánh giá để cải thiện toàn bộ nội dung của bài blog nhằm giúp nó lan tỏa mạnh mẽ hơn trên mạng xã hội.""",
       agent=reviewer,
       expected_output="Liệt kê các điểm chính về những chỗ cần được cải thiện.",
+      callback=callback_function
     )
+
+    re_write_blog_task = Task(
+        description=f"""Viết một bài blog về {prompt}. """,
+        expected_output="Một bài viết khoảng 2000 từ",
+        agent=writer,
+        # callback=callback_function,
+        context=[write_blog_task, review_blog_task]
+    )
+
     # Establishing the crew with a hierarchical process
     project_crew = Crew(
-        tasks=[task1, task2],  # Tasks to be delegated and executed under the manager's supervision
+        tasks=[write_blog_task, review_blog_task, re_write_blog_task],  # Tasks to be delegated and executed under the manager's supervision
         agents=[writer, reviewer],
         manager_llm=llm,
-        process=Process.hierarchical   
     )
 
     final = project_crew.kickoff()
