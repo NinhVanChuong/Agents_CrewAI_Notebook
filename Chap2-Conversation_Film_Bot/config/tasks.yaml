@@ -1,0 +1,5 @@
+assistant_task:
+  description: >
+    Phản hồi tin nhắn của người dùng: {user_message}. Sử dụng lịch sử hội thoại đã cung cấp: {context}.
+  expected_output: >
+    Phản hồi của bạn cần phải phù hợp, chính xác và hấp dẫn, trực tiếp giải đáp câu hỏi của người dùng hoặc tiếp tục cuộc trò chuyện một cách logic.

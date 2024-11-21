@@ -1,4 +1,4 @@
-# CrewAI: Defining and Executing AI Tasks with Agents
+# Defining and Executing AI Tasks with Agents
 The code defines a flow for executing AI-driven tasks using the GPT-4o-mini model. It starts by setting up the environment and initializing the ChatOpenAI instance as the language model. Structured output formats are defined using Pydantic models to ensure consistency. An AI expert agent is then created with a specific role, goal, and backstory to handle tasks related to AI questions. A task is defined, detailing the problem ("What is Machine Learning?"), the expected output, and assigning it to the agent. These components are grouped into a Crew, which organizes the agents and tasks for execution. The crew.kickoff() method triggers the agent to process the task using the GPT-4o-mini model and generate a structured response, which is then displayed in the console. This design is modular, allowing for easy extension with additional tasks or agents.
 ## 1. Environment Setup
 ```python
