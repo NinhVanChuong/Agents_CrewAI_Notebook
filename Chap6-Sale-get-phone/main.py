@@ -78,7 +78,8 @@ sale_agent = Agent(
 
 search_task = Task(
     description="""
-        Phản hồi tin nhắn của người dùng: {user_message}
+        Phản hồi tin nhắn của người dùng: {user_message}.
+        Nếu câu phản hồi của bạn sử dụng thông tin từ Product Search tool thì hãy chủ động xin số điện thoại của khách hàng ngay khi đưa ra thông tin sản phẩm
     """,
     expected_output='Một câu trả lời phù hợp với câu hỏi của người dùng.',
     agent=sale_agent,
@@ -92,7 +93,7 @@ crew = Crew(
     verbose=True
 )
 
-prompt = "a xin thông tin thanh rong biển" # HŨ CHOCOLATE CRUNCH WITH NUTS - BÁNH SOCOLA HẠT" 
+prompt = "a xin thông tin chôclate crunch" # HŨ CHOCOLATE CRUNCH WITH NUTS - BÁNH SOCOLA HẠT" 
 
 inputs = {
     "user_message": f"{prompt}",
