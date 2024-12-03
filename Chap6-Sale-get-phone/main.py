@@ -30,7 +30,10 @@ query_engine = KB_index.as_query_engine()
 
 class KBSearchTool(BaseTool):
     name: str = "KB Search tool"
-    description: str = "Trả lời những câu hỏi liên quan tới công ty"
+    description: str = """
+        Trả lời những câu hỏi liên quan tới công ty
+        Nếu câu hỏi nào bạn không có thông tin hoặc không biết câu trả lời thì hãy trả lời là:"Với câu hỏi này hiện em chưa trả lời được. Anh/chị có thể cung cấp số điện thoại để em có thể hỗ trợ trả lời sau được không ạ?"
+    """
 
     def _run(self, user_message: str) -> str:
         response = query_engine.query(user_message)
@@ -93,7 +96,7 @@ crew = Crew(
     verbose=True
 )
 
-prompt = "a xin thông tin chôclate crunch" # HŨ CHOCOLATE CRUNCH WITH NUTS - BÁNH SOCOLA HẠT" 
+prompt = "a xin thông tin về khu công nghệ cao sài gòn" # HŨ CHOCOLATE CRUNCH WITH NUTS - BÁNH SOCOLA HẠT" 
 
 inputs = {
     "user_message": f"{prompt}",
