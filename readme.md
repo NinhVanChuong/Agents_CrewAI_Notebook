@@ -15,3 +15,9 @@ This repository is ideal for anyone looking to dive into the world of **autonomo
 Chap2-AI workflows 
 ## 📚 References
 This repository is inspired by and builds upon the foundational concepts introduced in the [CrewAI GitHub repository](https://github.com/crewAIInc/crewAI). For further reading and advanced topics, please explore their repository.
+
+## Note
+Enable telemetry opt-out [Link](https://github.com/crewAIInc/crewAI/pull/402)
+```
+export CREWAI_TELEMETRY_OPT_OUT=True
+```
